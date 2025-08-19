@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+	<style>
+		.overlay {
+			position: fixed;
+			inset: 0;
+			background: rgba(0,0,0,0.4); /* 半透明の黒 */
+			z-index: 90;
+		}
+		.menu-sheet {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 80vh; /* 画面の8割 */
+			background: #fff;
+			border-radius: 20px 20px 0 0;
+			padding: 20px;
+			z-index: 100;
+			overflow-y: auto;
+		}
+		.hidden { display: none; }
+
+		.button {
+			background: #0064c8;
+			color: #fff;
+			font-weight: bold;
+			padding: 10px 30px;
+			border: none;
+			border-radius: 4px;
+			appearance: none;
+		}
+
+		.button:hover {
+			cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<div id="over" class="overlay hidden"></div><!-- 背景用 -->
+
+		<button id="open" class="menu-button button">ひらく</button>
+		<div id="menu-wrap" class="menu-sheet hidden">
+			<button id="close" class="menu-button button">とじる</button>
+		</div>
+	</main>
+</body>
+<script>
+
+	const open_btn = document.getElementById("open");
+	const close_btn = document.getElementById("close");
+	const overlay = document.getElementById("over");
+	const sheet = document.querySelector(".menu-sheet");
+	const items = document.querySelectorAll(".menu-item");
+
+	// 開くボタン
+	open_btn.addEventListener("click", () => {
+		overlay.classList.remove("hidden");
+		sheet.classList.remove("hidden");
+		openSheet(); // GSAPアニメーション呼び出し
+	});
+
+	// 閉じるボタン & 背景クリック
+	[close_btn, overlay].forEach(el => {
+		el.addEventListener("click", () => {
+			closeSheet();
+			setTimeout(() => {
+				overlay.classList.add("hidden");
+				sheet.classList.add("hidden");
+			}, 400); // アニメーション終わってから非表示
+		});
+	});
+
+	// 開くとき
+	function openSheet() {
+		gsap.fromTo(sheet,
+			{ y: "100%", opacity: 0, scale: 0.95 },
+			{
+				y: "0%", opacity: 1, scale: 1,
+				duration: 0.4, ease: "back.out(1.5)"
+			}
+		);
+
+		gsap.fromTo(items,
+			{ y: 20, opacity: 0 },
+			{ y: 0, opacity: 1, duration: 0.3, stagger: 0.08, delay: 0.1 }
+		);
+	}
+
+	// 閉じるとき
+	function closeSheet() {
+		gsap.to(items, {
+			y: 20, opacity: 0, duration: 0.2, stagger: 0.05, ease: "power1.in"
+		});
+
+		gsap.to(sheet, {
+			y: "100%", opacity: 0, scale: 0.95,
+			duration: 0.3, ease: "power1.in", delay: 0.1
+		});
+	}
+
+
+	const btn = document.querySelector(".button");
+
+	btn.addEventListener("mouseenter", () => {
+		gsap.to(btn, { scale: 1.1, duration: 0.2, ease: "back.out(2)" });
+	});
+
+	btn.addEventListener("mouseleave", () => {
+		gsap.to(btn, { scale: 1, duration: 0.2, ease: "power1.out" });
+	});
+
+	btn.addEventListener("click", () => {
+		gsap.to(btn, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
+	});
+</script>
+
+</html>
